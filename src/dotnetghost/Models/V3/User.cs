@@ -1,6 +1,6 @@
 using System;
 
-namespace dotnetghost.Models
+namespace dotnetghost.Models.V3
 {
     public class User
     {

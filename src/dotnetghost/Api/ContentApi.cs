@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using dotnetghost.Models;
+using dotnetghost.Exceptions;
 
 namespace dotnetghost.Api
 {
@@ -24,14 +26,19 @@ namespace dotnetghost.Api
             _apiUrl = apiUrl;
         }
 
-        public IEnumerable<TModel> Fetch<TModel>() where TModel : IFetchable
+        public Task<TModel> Fetch<TModel>(string resource) where TModel : IFetchable
         {
             throw new NotImplementedException();
         }
 
-        public string GetToken()
+        public Task<string> GetToken()
         {
-            return _apiKey;
+            return Task.Factory.StartNew(() => _apiKey);
+        }
+
+        public Task Insert<TModel>(string resource) where TModel : IFetchable
+        {
+            throw new OperationNotAllowedUsingContentApiException(_apiUrl, resource, "Insert");
         }
     }
 }

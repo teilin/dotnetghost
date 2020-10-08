@@ -8,7 +8,7 @@ namespace dotnetghost.Common
 {
     internal static class TokenGenerator
     {
-        internal static JwtToken Generate(string id, string secret)
+        internal static JwtToken Generate(ApiVersion apiVersion, string id, string secret)
         {
             var jwtToken = new JwtToken();
 
@@ -21,14 +21,14 @@ namespace dotnetghost.Common
                 .WithSecret(StringToByteArray(secret))
                 .AddClaim("exp", expiredAt.ToUnixTimeSeconds())
                 .AddClaim("iat", issuedAt.ToUnixTimeSeconds())
-                .AddClaim("aud", "/v3/admin/")
+                .AddClaim("aud", GhostVersion.GetVersionText(apiVersion))
                 .Encode();
 
             jwtToken.SetToken(token);
             return jwtToken;
         }
 
-        internal static byte[] StringToByteArray(string hex)
+        private static byte[] StringToByteArray(string hex)
         {
             return Enumerable.Range(0, hex.Length)
                 .Where(x => x % 2 == 0)
