@@ -1,3 +1,4 @@
+using System.IO;
 using System.Threading.Tasks;
 using dotnetghost;
 using dotnetghost.Models.V3;
@@ -6,23 +7,28 @@ using NUnit.Framework;
 
 namespace dotnetghosttests
 {
-    public class BaseTest
+    public abstract class BaseTest
     {
         protected string _apiUrl;
-        protected string _apiKey;
+        protected string _apiKeyContent;
+        protected string _apiKeyAdmin;
 
         protected BaseTest()
         {
         }
 
-        protected void LoadTestSettings()
+        protected Task LoadTestSettings()
         {
             var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.test.json", false)
                 .Build();
 
-            _apiUrl = config["ApiUrl"];
-            _apiKey = config["ApiKey"];
+            _apiUrl = config.GetValue<string>("ApiUrl");//config["ApiUrl"];
+            _apiKeyContent = config.GetValue<string>("ApiKeyContent");//config["ApiKeyContent"];
+            _apiKeyAdmin = config.GetValue<string>("ApiKeyAdmin");//config["ApiKeyAdmin"];
+
+            return Task.CompletedTask;
         }
     }
 }

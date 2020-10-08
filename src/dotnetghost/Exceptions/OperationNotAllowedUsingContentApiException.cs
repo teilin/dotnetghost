@@ -18,7 +18,7 @@ namespace dotnetghost.Exceptions
 
         public override string ToString()
         {
-            return $"This operation, {_resource} - {_method}, is not allowed using the content api. Use the admin api insted. Api: {_apiUrl}"
+            return $"This operation, {_resource} - {_method}, is not allowed using the content api. Use the admin api insted. Api: {_apiUrl}";
         }
     }
 }

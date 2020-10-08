@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using dotnetghost.Models;
 using dotnetghost.Exceptions;
+using System.Threading;
 
 namespace dotnetghost.Api
 {
@@ -26,7 +27,7 @@ namespace dotnetghost.Api
             _apiUrl = apiUrl;
         }
 
-        public Task<TModel> Fetch<TModel>(string resource) where TModel : IFetchable
+        public Task<TModel> Fetch<TModel>(string resource, CancellationToken cancellation) where TModel : IFetchable
         {
             throw new NotImplementedException();
         }
@@ -36,7 +37,7 @@ namespace dotnetghost.Api
             return Task.Factory.StartNew(() => _apiKey);
         }
 
-        public Task Insert<TModel>(string resource) where TModel : IFetchable
+        public Task Insert<TModel>(string resource, CancellationToken cancellation) where TModel : IFetchable
         {
             throw new OperationNotAllowedUsingContentApiException(_apiUrl, resource, "Insert");
         }

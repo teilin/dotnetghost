@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using dotnetghost.Common;
 using dotnetghost.Models;
 using System.Text.Json;
+using System.Threading;
 
 namespace dotnetghost.Api
 {
@@ -51,23 +52,34 @@ namespace dotnetghost.Api
             return Task.Factory.StartNew(() => _token.Token);
         }
 
-        public async Task<TModel> Fetch<TModel>(string resource) where TModel : IFetchable
+        public async Task<TModel> Fetch<TModel>(string resource, CancellationToken cancellation) where TModel : IFetchable
         {
             using(var client = new HttpClient())
             {
                 client.BaseAddress = new Uri(_apiUrl);
 
-                client.DefaultRequestHeaders.Add("Authorization", $"Ghost {GetToken()}");
-                client.DefaultRequestHeaders.Add("Content-Type", "application/json; charset=utf-8");
+                var jwtToken = await GetToken();
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Ghost", jwtToken);
+                client.DefaultRequestHeaders
+                    .Accept
+                    .Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                var responseStream = await client.GetStreamAsync($"ghost/api/v3/admin/{resource}");
+                var response = await client.GetAsync($"/ghost/api/v3/admin/{resource}", cancellation);
+                
+                response = response.EnsureSuccessStatusCode();
+
+                var responseStream = await response.Content.ReadAsStreamAsync();
+
+                //var responseStream = await client.GetStreamAsync($"ghost/api/v3/admin/{resource}");
                 var responseObject = await JsonSerializer.DeserializeAsync<TModel>(responseStream, Options);
 
                 return responseObject;
             }
         }
 
-        public Task Insert<TModel>(string resource) where TModel : IFetchable
+        public Task Insert<TModel>(string resource, CancellationToken cancellation) where TModel : IFetchable
         {
             throw new NotImplementedException();
         }
